@@ -1,4 +1,4 @@
-@media (max-width: 480px) {
+@media (min-width: 100px) and (max-width: 5000px) {
      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
 
 * {
@@ -92,5 +92,6 @@ p {
         transform: scale(1);
     }
 }
+
 
 }
