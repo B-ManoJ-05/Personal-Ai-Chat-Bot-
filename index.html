@@ -1,0 +1,572 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+ <link rel="website icon" type="png" href="./manoj_logo-removebg-preview.PNG">
+  <title>Personal Ai Chatbot</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: black;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .main-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .main-content h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .main-content p {
+      color: #666;
+      font-size: 18px;
+    }
+    
+    /* Chat Icon */
+    .chat-icon {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .chat-icon:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .chat-icon svg {
+      width: 30px;
+      height: 30px;
+      fill: white;
+    }
+    
+    /* Chatbot Container */
+    .chatbot-container {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 350px;
+      height: 500px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+      overflow: hidden;
+      animation: slideUp 0.3s ease;
+    }
+    
+    .chatbot-container.active {
+      display: flex;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Chatbot Header */
+    .chatbot-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .chatbot-title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+    
+    .close-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Chat Messages */
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+    }
+    
+    .message {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .message.user {
+      flex-direction: row-reverse;
+    }
+    
+    .message-content {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    
+    .bot .message-content {
+      background-color: #e9ecef;
+      color: #333;
+      margin-left: 10px;
+      border-bottom-left-radius: 5px;
+    }
+    
+    .user .message-content {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin-right: 10px;
+      border-bottom-right-radius: 5px;
+    }
+    
+    .bot-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    
+    .bot-avatar svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+    
+    /* Message Input */
+    .message-input-container {
+      padding: 15px 20px;
+      background: white;
+      border-top: 1px solid #e9ecef;
+    }
+    
+    .message-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .message-input input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 25px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    .message-input input:focus {
+      border-color: #667eea;
+    }
+    
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.2s;
+    }
+    
+    .send-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+    
+    /* Typing indicator */
+    .typing-indicator {
+      display: none;
+      margin-bottom: 15px;
+    }
+    
+    .typing-indicator .message-content {
+      background-color: #e9ecef;
+      color: #666;
+      margin-left: 10px;
+    }
+    
+    .typing-dots {
+      display: inline-flex;
+      gap: 3px;
+    }
+    
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      background-color: #999;
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    
+    .typing-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    /* Scrollbar */
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 480px) {
+      .chatbot-container {
+        width: calc(100vw - 20px);
+        height: calc(100vh - 120px);
+        right: 10px;
+        bottom: 80px;
+      }
+      
+      .chat-icon {
+        right: 20px;
+        bottom: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+    <h3 class="ma"> <img src="./manoj_logo-removebg-preview.PNG" alt="" width="150px" height="100px"></h3>
+ <div class="container">
+
+            <h1>My Personal AI Assistant</h1>
+            
+            <button id="listen-btn" class="btn">Start
+                Listening 🎙️</button>
+        </div>
+      <img src="./a--2.gif" alt="img-not-found">
+        <script src="./script.js">
+        
+    </script>
+
+
+
+
+
+
+
+  <!-- Main Content -->
+  <div class="main-content">
+    
+  </div>
+  
+  <!-- Chat Icon -->
+  <div class="chat-icon" id="chatIcon">
+    <svg viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+    </svg>
+  </div>
+  
+  <!-- Chatbot Container -->
+  <div class="chatbot-container" id="chatbotContainer">
+    <!-- Header -->
+    <div class="chatbot-header">
+      <div class="chatbot-title">Manoj Ai Assistant</div>
+      <button class="close-btn" id="closeBtn">&times;</button>
+    </div>
+    
+    <!-- Messages -->
+    <div class="chat-messages" id="chatMessages">
+      <!-- Messages will be added here -->
+    </div>
+    
+    <!-- Typing Indicator -->
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="message bot">
+        <div class="bot-avatar">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <div class="message-content">
+          <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Message Input -->
+    <div class="message-input-container">
+      <div class="message-input">
+        <input type="text" id="messageInput" placeholder="Type your message here..." maxlength="500">
+        <button class="send-btn" id="sendBtn">
+          <svg viewBox="0 0 24 24">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatIcon = document.getElementById('chatIcon');
+      const chatbotContainer = document.getElementById('chatbotContainer');
+      const closeBtn = document.getElementById('closeBtn');
+      const chatMessages = document.getElementById('chatMessages');
+      const messageInput = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const typingIndicator = document.getElementById('typingIndicator');
+      
+      let isOpen = false;
+      
+      // Sample bot responses
+      const botResponses = [
+        "That's interesting! Tell me more about that.",
+        "I understand. How can I help you with that?",
+        "Thanks for sharing that with me!",
+        "That sounds great! What would you like to know?",
+        "I'm here to help. What else can I assist you with?",
+        "That's a good point. Let me think about that.",
+        "I appreciate you telling me that. Anything else?",
+        "Interesting perspective! What made you think of that?",
+        "I see what you mean. How can I support you further?",
+        "That's helpful information. What's your next question?"
+      ];
+      
+      // Toggle chatbot
+      chatIcon.addEventListener('click', toggleChatbot);
+      closeBtn.addEventListener('click', toggleChatbot);
+      
+      // Send message
+      sendBtn.addEventListener('click', sendMessage);
+      messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      
+      // Enable/disable send button based on input
+      messageInput.addEventListener('input', function() {
+        sendBtn.disabled = this.value.trim() === '';
+      });
+      
+      function toggleChatbot() {
+        isOpen = !isOpen;
+        chatbotContainer.classList.toggle('active', isOpen);
+        
+        if (isOpen && chatMessages.children.length === 0) {
+          // Add welcome message when first opened
+          setTimeout(() => {
+            addBotMessage("Hello! I'm your personal AI assistant.  tell me anything you'd like to discuss!");
+          }, 300);
+        }
+      }
+      
+      function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        // Add user message
+        addUserMessage(message);
+        
+        // Clear input
+        messageInput.value = '';
+        sendBtn.disabled = true;
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Generate bot response after delay
+        setTimeout(() => {
+          hideTypingIndicator();
+          const response = generateBotResponse(message);
+          addBotMessage(response);
+        }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+      }
+      
+      function addUserMessage(text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message user';
+        messageDiv.innerHTML = `
+          <div class="message-content">${escapeHtml(text)}</div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+      }
+      
+      function addBotMessage(text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot';
+        messageDiv.innerHTML = `
+          <div class="bot-avatar">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <div class="message-content">${escapeHtml(text)}</div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+      }
+      
+      function showTypingIndicator() {
+        typingIndicator.style.display = 'block';
+        scrollToBottom();
+      }
+      
+      function hideTypingIndicator() {
+        typingIndicator.style.display = 'none';
+      }
+      
+      function generateBotResponse(userMessage) {
+        // Simple response generation based on keywords
+        const message = userMessage.toLowerCase();
+        
+        if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+          return "Hello Manoj! It's great to meet you. How are you doing today?";
+        } else if (message.includes('help')) {
+          return "I'm here to help! What do you need assistance with?";
+        } else if (message.includes('name') || message.includes('who are you') || message.includes('what is your name')) {
+          return "I'm your personal AI assistant! You can call me Lilly.";
+        } else if (message.includes('how are you')) {
+          return "I'm doing great, thank you for asking! I'm here and ready to chat with you.";
+        } else if (message.includes('thank')) {
+          return "You're very welcome Manoj! I'm happy I could help.";
+        } else if (message.includes('bye') || message.includes('goodbye')) {
+          return "Goodbye! It was nice chatting with you. Feel free to come back anytime!";
+        } else if (message.includes('tell my number') || message.includes('my number') || message.includes('number')) {
+          return "Hello Manoj your number is 9347561132";
+        } else if (message.includes('tell my DOB') || message.includes('tell my date of birth') || message.includes('my DOB')|| message.includes('my date of birth') || message.includes('DOB') || message.includes('date of birth')) {
+          return "Hello Manoj your DOF is 22/10/2003";
+        } else if (message.includes('open my github profile') || message.includes('open my github') || message.includes('can you open my github prifile') || message.includes('github')) {
+            return "sure Manoj!Here is the link: https://github.com/B-ManoJ-05";
+        } else if (message.includes('open my Linkedin profile') || message.includes('open my linkedin') || message.includes('can you open my Linkedin prifile') || message.includes('linkedin')) {
+            return "sure Manoj!Here is the link: https://www.linkedin.com/in/boya-manoj-a6050a311";
+        } else if (message.includes('you know my favourite song') || message.includes('my favourite song') || message.includes('song') || message.includes('favourite song')) {
+            return "sure Manoj!Here is the link: https://youtu.be/NL4Ue1Z3MuQ ";
+        } else if (message.includes('pdfs link')|| message.includes('pdfs') || message.includes('pdf') || message.includes('open my pdfs')) {
+            return "sure Manoj!Here is the link: https://b-manoj-05.github.io/pdfweb-3-1and3-2-pdfs-R20-/";
+        } else if (message.includes('kn')|| message.includes('kodnest') || message.includes('pdf') || message.includes('open my kodnest pdfs') || message.includes('open my kn profile')) {
+            return "sure Manoj!Here is the link:  https://app.kodnest.com/my-learning/profile";
+        } else if (message.includes('resume')|| message.includes('my resume') || message.includes('open my resume') || message.includes('resume link')|| message.includes('resume pdf') || message.includes('cv') || message.includes('cv link')) {
+            return "sure Manoj!Here is the link: https://b-manoj-05.github.io/Portfolio-Website/Boya%20Manoj%20Resume.pdf";  
+        } else {
+          // Return a random response
+          return botResponses[Math.floor(Math.random() * botResponses.length)];
+        }
+      }
+      
+      function scrollToBottom() {
+        setTimeout(() => {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 100);
+      }
+      
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+      
+      // Initialize send button state
+      sendBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>
